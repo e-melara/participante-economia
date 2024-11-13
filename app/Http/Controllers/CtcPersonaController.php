@@ -13,12 +13,20 @@ use App\Models\CtcContacto;
 use App\Models\CtcDocumento;
 
 use App\Trait\GetDataApiTrait;
+use App\Mail\SendNotificationUser;
 use App\Http\Requests\PersonaStoreRequest;
+use Illuminate\Support\Facades\Mail;
 
 class CtcPersonaController extends Controller
 {
     use GetDataApiTrait;
-    /**
+
+    public function __construct()
+    {
+        $this->middleware('auth')->except('store');
+    }
+
+  /**
      * Display a listing of the resource.
      */
     public function index()
@@ -60,7 +68,10 @@ class CtcPersonaController extends Controller
 
             $carbon = Carbon::parse($request->input('birthdate'))->format('Y-m-d');
             $response = $this->getDataRNPN($documento, $carbon);
+            Log::info("Response: " . $carbon);
             $dataToPerson = $this->getDataFormat($response[0]);
+
+            $emailToPerson = trim($request->input('email'));
 
             DB::beginTransaction();
 
@@ -74,7 +85,7 @@ class CtcPersonaController extends Controller
             $persona->documentos_contactos()->create([
                 'model_id' => 2,
                 'model_type' => CtcContacto::class,
-                'valor' => trim($request->input('email')),
+                'valor' => $emailToPerson,
             ]);
 
             $persona->documentos_contactos()->create([
@@ -85,14 +96,14 @@ class CtcPersonaController extends Controller
 
             // Crear usuario
             $passwordGenerated = Str::random(8);
-            Log::info("Password generated: {$passwordGenerated}");
             $user = $persona->user()->create([
-                'email' => $request->input('email'),
+                'email' => $emailToPerson,
                 'name' => "{$persona->nombres} {$persona->apellidos}",
                 'password' => bcrypt($passwordGenerated),
             ]);
 
             $user->assignRole('Participante');
+            Mail::to($emailToPerson)->send(new SendNotificationUser($persona, $passwordGenerated, $emailToPerson));
             DB::commit();
             return redirect()->back()->with('success', 'Gracias por enviar tus datos. Te enviaremos un correo electrónico con los pasos siguientes para continuar.');
         } catch (\Exception $e) {
@@ -132,5 +143,10 @@ class CtcPersonaController extends Controller
     public function destroy(CtcPersona $ctcPersona)
     {
         //
+    }
+
+    public function validar(Request $request)
+    {
+
     }
 }

@@ -78,10 +78,8 @@ trait GetDataApiTrait
     {
         $documentoFormat = str_replace('-', '', $resquest['dui']);
         $contenidoImage = file_get_contents($resquest['img_url']);
-        $folder = "public/personas/{$documentoFormat}.jpg";
-
-        Storage::put($folder, $contenidoImage);
-
-        return Storage::url($folder);
+        $nameFile = "{$documentoFormat}.jpg";
+        Storage::disk('public')->put($nameFile, $contenidoImage);
+        return $nameFile;
     }
 }

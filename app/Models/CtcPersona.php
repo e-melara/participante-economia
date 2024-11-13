@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class CtcPersona extends Model
 {
@@ -13,6 +14,14 @@ class CtcPersona extends Model
     protected $guarded = [];
 
     protected $table = 'ctc_personas';
+
+    public function fullName() {
+        return $this->nombres . ' ' . $this->apellidos;
+    }
+
+    public function photo_url() {
+      return Storage::disk('public')->url($this->avatar);
+    }
 
     public function municipio_residencia()
     {
@@ -31,7 +40,7 @@ class CtcPersona extends Model
     public function estado_civil() {
         return $this->belongsTo(CtcEstadoCivil::class, 'estado_civil_id');
     }
-    
+
     public function documentos_contactos()
     {
         return $this->hasMany(CtcPersonaContactoDocumento::class, 'persona_id');

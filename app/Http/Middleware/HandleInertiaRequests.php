@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -29,16 +30,25 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        $responseTo = array(
+          'auth' => [
+            'user' => $user,
+          ],
+          'status' => [
+            'success' => $request->session()->get('success'),
+            'error' => $request->session()->get('error'),
+            'show' => $request->session()->get('error') || $request->session()->get('success'),
+          ],
+        );
+
+        if(!empty($user->persona)) {
+          $responseTo['auth']['avatar'] = @$user->persona->photo_url();
+        }
+
         return [
             ...parent::share($request),
-            'auth' => [
-                'user' => $request->user(),
-            ],
-            'status' => [
-                'success' => $request->session()->get('success'),
-                'error' => $request->session()->get('error'),
-                'show' => $request->session()->get('error') || $request->session()->get('success'),
-            ],
+            ...$responseTo
         ];
     }
 }

@@ -10,4 +10,9 @@ class CtcEstadoCivil extends Model
     use HasFactory;
 
     protected $table = 'ctc_estados_civiles';
+
+    protected $guarded = [];
+    protected $hidden = [
+        'created_at', 'updated_at'
+    ];
 }

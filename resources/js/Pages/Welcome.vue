@@ -1,5 +1,6 @@
 <script setup>
 import {ref} from 'vue'
+import { format } from 'date-fns'
 import * as yup from 'yup'
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
@@ -17,12 +18,13 @@ const props = defineProps({
     }
 });
 
+const flow = ref(['year', 'month', 'calendar']);
 const fechaLimite = new Date(props.fechaLimite);
 
 const form = useForm({
     dui: null,
     email: null,
-    birthdate: fechaLimite,
+    birthdate: null,
     phone: null
 });
 
@@ -45,6 +47,7 @@ const submitForm = async () => {
     try {
         errors.value = {};
         await schema.validateSync(form.data(), {abortEarly: false});
+        form.birthdate = formatDate(form.birthdate);
         await form.post(route('persona.store'), {
             preserveState: true,
             onError: (errors) => {
@@ -58,6 +61,9 @@ const submitForm = async () => {
     }
 }
 
+const formatDate = (date) => {
+  return format(date, 'yyyy-MM-dd');
+}
 </script>
 
 <template>
@@ -97,8 +103,8 @@ const submitForm = async () => {
                 </div>
                 <div class="sm:col-span-2">
                     <label for="company" class="block text-sm/6 font-semibold text-gray-900">Fecha de nacimiento</label>
-                    <vue-date-picker :max-date="fechaLimite" v-model="form.birthdate" :enable-time-picker="false" placeholder="Fecha de nacimiento" />
-                    <message-error :message="errors.birthdate" v-if="errors.birthdate"/>
+                    <vue-date-picker  :flow="flow" :max-date="fechaLimite" v-model="form.birthdate" :enable-time-picker="false" placeholder="Fecha de nacimiento" />
+                    <message-error  :message="errors.birthdate" v-if="errors.birthdate"/>
                 </div>
                 <div class="sm:col-span-2">
                     <label for="company" class="block text-sm/6 font-semibold text-gray-900">Numero de telefono</label>
