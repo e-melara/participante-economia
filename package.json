@@ -20,6 +20,8 @@
     "dependencies": {
         "@vuepic/vue-datepicker": "^10.0.0",
         "date-fns": "^4.1.0",
+        "flowbite": "^2.5.2",
+        "flowbite-vue": "^0.1.6",
         "vue-3-mask": "^0.0.1-alpha",
         "yup": "^1.4.0"
     }

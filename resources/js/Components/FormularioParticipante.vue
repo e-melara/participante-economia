@@ -132,7 +132,7 @@
       </div>
       <div>
         <figure v-if="persona.photo">
-          <img :src="persona.photo" alt="imagen del usuario" class="object-contain w-full" />
+          <img :src="persona.photo" alt="imagen del usuario" class="w-full" />
         </figure>
       </div>
     </div>

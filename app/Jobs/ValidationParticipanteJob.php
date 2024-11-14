@@ -36,8 +36,6 @@ class ValidationParticipanteJob implements ShouldQueue
         $emailToPerson = $this->data['email'];
         $personIsAproved = $validation['valido'];
 
-        Log::info(json_encode($validation));
-
         CtcPersonaInformation::create(
           [
             'respuestas' => $this->data,
@@ -63,14 +61,14 @@ class ValidationParticipanteJob implements ShouldQueue
           ];
           $this->getDataSICAF($payload);
         } else {
-//          SendEmailJob::dispatch([
-//            'email' => $emailToPerson,
-//            'asunto' => 'Resolucion de la validacion',
-//            'template' => 'emails.notification_user_not_aprove',
-//            'data' => [
-//              'persona' => $this->data['persona_full'],
-//            ]
-//          ]);
+          SendEmailJob::dispatch([
+            'email' => $emailToPerson,
+            'asunto' => 'Resolucion de la validacion',
+            'template' => 'emails.notification_user_not_aprove',
+            'data' => [
+              'persona' => $this->data['persona_full'],
+            ]
+          ]);
         }
         DB::commit();
       } catch (\Exception $e) {

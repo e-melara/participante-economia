@@ -19,6 +19,11 @@ trait ValidadoDataTrait
       return $reponseToArray;
     }
 
+    if(strcmp($data['participa_o_recibe'], 'SI') == 0) {
+      $reponseToArray['observacion'] = 'La persona actualmente participa y recibe estipendio en un programa social';
+      return $reponseToArray;
+    }
+
     if(strcmp($data['ocupacion'], 'EMPLEO') == 0) {
       $reponseToArray['observacion'] = 'La ocupacion de la persona no es la correcta';
       return $reponseToArray;

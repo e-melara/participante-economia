@@ -67,45 +67,6 @@ class CtcPersonaController extends Controller
                 'phone' => $request->input('phone'),
                 'email' => $request->input('email'),
             ]);
-
-//            $carbon = Carbon::parse($request->input('birthdate'))->format('Y-m-d');
-//            $response = $this->getDataRNPN($documento, $carbon);
-//
-//            $dataToPerson = $this->getDataFormat($response[0]);
-//            $emailToPerson = trim($request->input('email'));
-//
-//            DB::beginTransaction();
-//
-//            $persona = CtcPersona::create($dataToPerson);
-//            $persona->documentos_contactos()->create([
-//                'valor' => trim($documento),
-//                'model_id' => 1,
-//                'model_type' => CtcDocumento::class,
-//            ]);
-//
-//            $persona->documentos_contactos()->create([
-//                'model_id' => 2,
-//                'model_type' => CtcContacto::class,
-//                'valor' => $emailToPerson,
-//            ]);
-//
-//            $persona->documentos_contactos()->create([
-//                'model_id' => 1,
-//                'model_type' => CtcContacto::class,
-//                'valor' => trim($request->input('phone')),
-//            ]);
-//
-//            // Crear usuario
-//            $passwordGenerated = Str::random(8);
-//            $user = $persona->user()->create([
-//                'email' => $emailToPerson,
-//                'name' => "{$persona->nombres} {$persona->apellidos}",
-//                'password' => bcrypt($passwordGenerated),
-//            ]);
-//
-//            $user->assignRole('Participante');
-//            Mail::to($emailToPerson)->send(new SendNotificationUser($persona, $passwordGenerated, $emailToPerson));
-//            DB::commit();
             return redirect()->back()->with('success', 'Gracias por enviar tus datos. Te enviaremos un correo electrónico con los pasos siguientes para continuar.');
         } catch (\Exception $e) {
             Log::error("Error: {$e->getMessage()}");
@@ -209,39 +170,12 @@ class CtcPersonaController extends Controller
         'estudiando' => $request->input('estudiando'),
         'numero_personas' => $request->input('numero_personas'),
         'nivel_escolaridad' => $request->input('nivel_escolaridad'),
+        'participa_o_recibe' => $request->input('participa_o_recibe'),
         'persona_full' => $persona->fullName(),
       ];
 
       ValidationParticipanteJob::dispatch($dataValidation);
       return redirect()->back()
           ->with('success', 'Gracias por enviar su información. La hemos recibido exitosamente y nuestro equipo se comunicará con usted en breve para brindarle más detalles y los próximos pasos a seguir.');
-
-//      $validation = $this->validationPerson($dataValidation);
-//
-//      if($validation['valido']) {
-//        $email = $auth->email;
-//        // FIXED: falta el id de la persona a la que se le envia el correo no se filtra por el id de persona
-//        $ctcPersonaDocumento = CtcPersonaContactoDocumento::where(function ($query) {
-//          $query->where('model_type', 'App\Models\CtcDocumento')
-//            ->where('model_id', 1);
-//        })->select('valor')->first();
-//
-//        $payload = [
-//          'documento' => $ctcPersonaDocumento->valor,
-//          'fecha_nacimiento' => $birthdate,
-//          'email' => $email,
-//        ];
-//
-//        try {
-//          $response = $this->getDataSICAF($payload);
-//
-//
-//        } catch (\Exception $e) {
-//          Log::error("Error: {$e->getMessage()}");
-//          return redirect()->back()->with('error', 'Por el momento tenemos problemas con el servicio, intente más tarde');
-//        }
-//      } else {
-//        // Enviar el correo electronico con la negacion de su participacion
-//      }
     }
 }
