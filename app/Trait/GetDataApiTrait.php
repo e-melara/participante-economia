@@ -13,6 +13,11 @@ use Illuminate\Support\Str;
 
 trait GetDataApiTrait
 {
+    public function getDataSICAF($playload = array()) {
+      $response = Http::post(env('URL_SICAF'), $playload);
+      return $response->json();
+    }
+
     public function getToken()
     {
         $response = Http::post('https://api-servicios-externos.goes-dev.net/api/token/client', [

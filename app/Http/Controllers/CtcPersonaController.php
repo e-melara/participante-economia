@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\CtcPersona;
 use App\Models\CtcContacto;
 use App\Models\CtcDocumento;
+use App\Models\CtcPersonaContactoDocumento;
 
 use App\Trait\GetDataApiTrait;
 use App\Mail\SendNotificationUser;
@@ -145,8 +146,93 @@ class CtcPersonaController extends Controller
         //
     }
 
+    public function validationPerson($data = array())
+    {
+      $reponseToArray = array(
+        'observacion' => '',
+        'valido' => false,
+      );
+
+      $edad = Carbon::parse($data['fecha_nacimiento'])->age;
+      if($edad > 40) {
+        $reponseToArray['observacion'] = 'La edad del participante es mayor a 40 años';
+        return $reponseToArray;
+      }
+
+      if(strcmp($data['ocupacion'], 'EMPLEO')) {
+        $reponseToArray['observacion'] = 'La ocupacion de la persona no es la correcta';
+        return $reponseToArray;
+      }
+
+      $escolaridadValida = ['SECUNDARIA', 'MEDIA', 'SUPERIOR'];
+      if(!in_array($data['nivel_escolaridad'], $escolaridadValida)) {
+        $reponseToArray['observacion'] = 'El nivel de escolaridad no es el correcto';
+        return $reponseToArray;
+      }
+
+      if(strcmp($data['estudiando'], 'SI')) {
+        $reponseToArray['observacion'] = 'La persona esta estudiando';
+        return $reponseToArray;
+      }
+
+      // calculado el ingreso percapita
+      $ingresoPerCapita = $data['ingresos'] / $data['numero_personas'];
+      if($ingresoPerCapita < 67.67 && $ingresoPerCapita > 270) {
+        $reponseToArray['observacion'] = 'El ingreso percapita es menor a 67.67 y mayor a 270';
+        return $reponseToArray;
+      }
+
+      $reponseToArray['valido'] = true;
+      return $reponseToArray;
+    }
+
     public function validar(Request $request)
     {
+      $request->validate([
+        'ingresos' => 'required|numeric',
+        'numero_personas' => 'required|numeric',
+        'estudiando' => 'required|string',
+        'nivel_escolaridad' => 'required|string',
+        'ocupacion' => 'required|string',
+      ]);
 
+      $auth = $request->user();
+      $birthdate = $auth->persona->fecha_nacimiento;
+
+      $dataValidation = [
+        'fecha_nacimiento' => $birthdate,
+        'ingresos' => $request->input('ingresos'),
+        'ocupacion' => $request->input('ocupacion'),
+        'estudiando' => $request->input('estudiando'),
+        'numero_personas' => $request->input('numero_personas'),
+        'nivel_escolaridad' => $request->input('nivel_escolaridad'),
+      ];
+
+      $validation = $this->validationPerson($dataValidation);
+
+      if($validation['valido']) {
+        $email = $auth->email;
+        $ctcPersonaDocumento = CtcPersonaContactoDocumento::where(function ($query) {
+          $query->where('model_type', 'App\Models\CtcDocumento')
+            ->where('model_id', 1);
+        })->select('valor')->first();
+
+        $payload = [
+          'documento' => $ctcPersonaDocumento->valor,
+          'fecha_nacimiento' => $birthdate,
+          'email' => $email,
+        ];
+
+        try {
+          $response = $this->getDataSICAF($payload);
+          Log::info($response);
+          return redirect()->back()->with('success', 'Gracias por enviar tus datos. Te enviaremos un correo electrónico con los pasos siguientes para continuar.');
+        } catch (\Exception $e) {
+          Log::error("Error: {$e->getMessage()}");
+          return redirect()->back()->with('error', 'Por el momento tenemos problemas con el servicio, intente más tarde');
+        }
+      } else {
+        // Enviar el correo electronico con la negacion de su participacion
+      }
     }
 }

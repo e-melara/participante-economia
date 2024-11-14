@@ -55,6 +55,7 @@ const submitForm = async () => {
             }
         });
     } catch (validationError) {
+      console.log(validationError)
         validationError.inner.forEach(error => {
             errors.value[error.path] = error.message;
         });
@@ -62,7 +63,7 @@ const submitForm = async () => {
 }
 
 const formatDate = (date) => {
-  return format(date, 'yyyy-MM-dd');
+  return format(new Date(date), 'yyyy-MM-dd');
 }
 </script>
 
