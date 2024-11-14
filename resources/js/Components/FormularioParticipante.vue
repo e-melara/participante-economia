@@ -116,7 +116,7 @@
               disabled
             />
           </div>
-          
+
           <div class="col-span-2">
             <InputLabel for="profesion" value="Profesion: " />
             <TextInput
@@ -145,6 +145,4 @@ import TextInput from '@/Components/TextInput.vue';
 const {persona} = defineProps({
   persona: Object,
 });
-
-console.log(persona);
 </script>

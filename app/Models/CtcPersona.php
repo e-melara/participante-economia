@@ -50,4 +50,9 @@ class CtcPersona extends Model
     {
         return $this->hasOne(User::class, 'persona_id');
     }
+
+    public function informacion()
+    {
+        return $this->hasOne(CtcPersonaInformation::class, 'persona_id');
+    }
 }

@@ -1,11 +1,14 @@
 <template>
   <div class="container w-full">
+    <message :props="props.status" v-if="props.status && props.status.show" class="mb-6" />
+
     <form @submit.prevent="onSubmit">
       <article class="grid grid-cols-4 gap-4">
         <div class="col-span-2">
           <InputLabel for="ocupacion" value="¿Cuál es su situación ocupacional actualmente?" class="mb-2"/>
           <select
             v-model="form.ocupacion" id="ocupacion"
+            :disabled="haveData || haveDataSaving"
             class="border-gray-300 w-full dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
           >
             <option value="EMPLEO">Empleado formal (Cotiza en ISSS y/o AFP)</option>
@@ -18,7 +21,7 @@
         <div class="col-span-2">
           <InputLabel for="nivel_escolaridad" value="¿Cuál es su máximo nivel de escolaridad en el que ha recibido título o diploma?" class="mb-2"/>
           <select
-            id="nivel_escolaridad" v-model="form.nivel_escolaridad"
+            id="nivel_escolaridad" v-model="form.nivel_escolaridad" :disabled="haveData || haveDataSaving"
             class="border-gray-300 w-full dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
           >
             <option value="NINGUNO">Ninguno</option>
@@ -36,6 +39,7 @@
             id="ingresos"
             v-model="form.ingresos"
             type="number"
+            :disabled="haveData || haveDataSaving"
             placeholder="Ingresos mensuales en dólares"
             class="mt-1 block w-full"
             required
@@ -49,6 +53,7 @@
             v-model="form.numero_personas"
             placeholder="Número de personas"
             type="number"
+            :disabled="haveData || haveDataSaving"
             class="mt-1 block w-full"
             required
           />
@@ -57,7 +62,7 @@
         <div class="col-span-full">
           <InputLabel for="estudiando" value="¿Actualmente se encuentra estudiando en un centro educativo formal (Escuela, Colegio, Universidad, Centro Escolar, Institutos Tecnológicos, Escuela Superior)?" class="mb-2"/>
           <select
-            id="estudiando" v-model="form.estudiando"
+            id="estudiando" v-model="form.estudiando" :disabled="haveData || haveDataSaving"
             class="border-gray-300 w-full dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
           >
             <option value="SI">SI</option>
@@ -66,10 +71,13 @@
           <message-error v-if="errors.estudiando" :message="errors.estudiando" />
         </div>
 
-        <div class="col-span-full">
+        <div class="col-span-full" v-if="!(haveData || haveDataSaving)">
           <PrimaryButton>
             Guardar
           </PrimaryButton>
+        </div>
+        <div v-else class="col-span-full">
+          <message :props="{ success: 'Gracias por enviar su información. La hemos recibido exitosamente y nuestro equipo se comunicará con usted en breve para brindarle más detalles y los próximos pasos a seguir.' }" />
         </div>
       </article>
     </form>
@@ -78,25 +86,31 @@
 
 <script setup>
 import * as yup from 'yup'
-import { defineProps, ref, defineEmits } from 'vue'
-import { useForm } from '@inertiajs/vue3'
-
+import { defineProps, ref } from 'vue'
+import { useForm, usePage } from '@inertiajs/vue3'
 
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import MessageError from "@/Components/Shared/MessageError.vue";
+import {boolean} from "yup";
+import Message from "@/Components/Shared/Message.vue";
 
-const {persona} = defineProps({
+const props = usePage().props;
+const haveDataSaving = ref(false);
+
+const {persona, haveData, data} = defineProps({
   persona: Object,
+  haveData: boolean,
+  data: Object
 });
 
 const form = useForm({
-  ocupacion: null,
-  nivel_escolaridad: null,
-  ingresos: null,
-  numero_personas: null,
-  estudiando: null
+  ocupacion: haveData ? data.respuestas.ocupacion : null,
+  nivel_escolaridad: haveData ? data.respuestas.nivel_escolaridad : null,
+  ingresos: haveData ? data.respuestas.ingresos : null,
+  numero_personas: haveData ? data.respuestas.numero_personas : null,
+  estudiando: haveData ? data.respuestas.estudiando : null,
 });
 
 const schema = yup.object().shape({
@@ -117,7 +131,7 @@ const onSubmit = () => {
     form.data.persona_id = persona.id;
     form.post(route('persona.validar'), {
       onSuccess: () => {
-        console.log('success');
+        haveDataSaving.value = true;
       }
     });
   } catch (validationError) {

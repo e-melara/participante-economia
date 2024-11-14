@@ -7,6 +7,8 @@ import FormularioParticipantePreguntas from '@/Components/FormularioParticipante
 
 const props = defineProps({
     persona: Object,
+    haveToComplete: Boolean,
+    dataToInformacion: Object,
 });
 </script>
 
@@ -27,7 +29,7 @@ const props = defineProps({
                 </div>
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm mt-10 sm:rounded-lg">
                     <div class="p-6 text-gray-900 dark:text-gray-100">
-                        <FormularioParticipantePreguntas :persona="persona?.data" />
+                        <FormularioParticipantePreguntas :haveData="haveToComplete" :data="dataToInformacion" :persona="persona?.data" />
                     </div>
                 </div>
             </div>
