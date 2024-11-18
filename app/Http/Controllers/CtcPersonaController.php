@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\ValidationParticipanteJob;
 use Carbon\Carbon;
+use Ichtrojan\Otp\Otp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 use App\Models\CtcPersona;
+use App\Jobs\SendEmailJob;
 use App\Trait\GetDataApiTrait;
 use App\Jobs\GuadarDataParticipanteJob;
+use App\Jobs\ValidationParticipanteJob;
 use App\Http\Requests\PersonaStoreRequest;
 
 class CtcPersonaController extends Controller
@@ -19,23 +21,7 @@ class CtcPersonaController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth')->except('store');
-    }
-
-  /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $this->middleware('auth')->except('store', 'generateToken');
     }
 
     private function getValidatedDocumentoOrContacto($value = '', $model = 'App\Models\CtcDocumento') {
@@ -45,14 +31,33 @@ class CtcPersonaController extends Controller
             ->count();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * @param PersonaStoreRequest $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function store(PersonaStoreRequest $request): \Illuminate\Http\RedirectResponse
     {
         try {
+
+            $request->validated([
+              'token' => 'required|string|max:6',
+              'dui' => 'required|string|max:10',
+              'birthdate' => 'required|date',
+              'phone' => 'required|string|max:9',
+              'email' => 'required|email'
+            ]);
+
+            $validatedOtp = (new Otp())->validate(
+              $request->input('email'),
+              trim($request->input('token'))
+            );
+
+            if (!$validatedOtp->status) {
+              return redirect()
+                ->back()
+                ->with('error',
+                  $validatedOtp->message == 'OTP is not valid' ?
+                    'El token ingresado no es válido. Por favor, verifica el token e intenta nuevamente.' :
+                    'El token ingresado ha expirado. Por favor, solicita uno nuevo.'
+                );
+            }
+
             if ($this->getValidatedDocumentoOrContacto($request->input('dui')) != 0) {
                 return redirect()->back()->with('error', 'El documento que has ingresado ya existe en nuestro sistema. Verifica los datos proporcionados o contacta soporte si necesitas asistencia adicional.');
             }
@@ -72,78 +77,6 @@ class CtcPersonaController extends Controller
             Log::error("Error: {$e->getMessage()}");
             return redirect()->back()->with('error', 'Por el momento tenemos problemas con el servicio, intente más tarde');
         }
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(CtcPersona $ctcPersona)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(CtcPersona $ctcPersona)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, CtcPersona $ctcPersona)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(CtcPersona $ctcPersona)
-    {
-        //
-    }
-
-    public function validationPerson($data = array())
-    {
-      $reponseToArray = array(
-        'observacion' => '',
-        'valido' => false,
-      );
-
-      $edad = Carbon::parse($data['fecha_nacimiento'])->age;
-      if($edad > 40) {
-        $reponseToArray['observacion'] = 'La edad del participante es mayor a 40 años';
-        return $reponseToArray;
-      }
-
-      if(strcmp($data['ocupacion'], 'EMPLEO')) {
-        $reponseToArray['observacion'] = 'La ocupacion de la persona no es la correcta';
-        return $reponseToArray;
-      }
-
-      $escolaridadValida = ['SECUNDARIA', 'MEDIA', 'SUPERIOR'];
-      if(!in_array($data['nivel_escolaridad'], $escolaridadValida)) {
-        $reponseToArray['observacion'] = 'El nivel de escolaridad no es el correcto';
-        return $reponseToArray;
-      }
-
-      if(strcmp($data['estudiando'], 'SI')) {
-        $reponseToArray['observacion'] = 'La persona esta estudiando';
-        return $reponseToArray;
-      }
-
-      // calculado el ingreso percapita
-      $ingresoPerCapita = $data['ingresos'] / $data['numero_personas'];
-      if($ingresoPerCapita < 67.67 && $ingresoPerCapita > 270) {
-        $reponseToArray['observacion'] = 'El ingreso percapita es menor a 67.67 y mayor a 270';
-        return $reponseToArray;
-      }
-
-      $reponseToArray['valido'] = true;
-      return $reponseToArray;
     }
 
     public function validar(Request $request)
@@ -177,5 +110,25 @@ class CtcPersonaController extends Controller
       ValidationParticipanteJob::dispatch($dataValidation);
       return redirect()->back()
           ->with('success', 'Gracias por enviar su información. La hemos recibido exitosamente y nuestro equipo se comunicará con usted en breve para brindarle más detalles y los próximos pasos a seguir.');
+    }
+
+    public function generateToken(Request $request)
+    {
+      $request->validate([
+        'email' => 'required|email',
+      ], [
+        'email.required' => 'El correo electrónico es requerido.',
+        'email.email' => 'El correo electrónico no es válido.',
+      ]);
+
+      $generateToken = (new Otp())->generate($request->input('email'), 'numeric', 6);
+      SendEmailJob::dispatch([
+        'email' => $request->input('email'),
+        'asunto' => 'Token de validación',
+        'template' => 'emails.token_validation_user',
+        'data' => [
+          'token' => $generateToken,
+        ]
+      ]);
     }
 }

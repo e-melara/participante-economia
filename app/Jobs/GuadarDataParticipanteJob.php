@@ -38,15 +38,16 @@ class GuadarDataParticipanteJob implements ShouldQueue
       $documento = trim($this->data['dui']);
       $birthDate =  Carbon::parse(trim($this->data['birthdate']))->format('Y-m-d');
 
-      $response = $this->getDataRNPN($documento, $birthDate);
-
-      if (!(is_array($response) && count($response) > 0)) {
+      try {
+        $response = $this->getDataRNPN($documento, $birthDate);
+        if (!(is_array($response) && count($response) > 0)) {
           Log::info('No se encontraron datos en el RNPN -> Documento '. $documento. ' < --- >'. $birthDate);
           exit();
-      }
+        }
 
-      $dataToPerson = $this->getDataFormat($response[0]);
-      try {
+        Log::info(json_encode($response));
+        $dataToPerson = $this->getDataFormat($response[0]);
+
         DB::beginTransaction();
         $persona = CtcPersona::create($dataToPerson);
 

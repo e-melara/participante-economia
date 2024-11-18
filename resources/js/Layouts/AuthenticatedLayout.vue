@@ -1,13 +1,14 @@
 <script setup>
-import { ref } from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from "@inertiajs/vue3";
+import { hasRolesUtils, hasPermission } from '@/utils/hasRolesUtils.js';
 
-const showingNavigationDropdown = ref(false);
+const { roles } = usePage().props.auth.user;
+hasRolesUtils(roles);
 </script>
 
 <template>
@@ -30,7 +31,7 @@ const showingNavigationDropdown = ref(false);
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                                    Dashboard
+                                    Informacion
                                 </NavLink>
                             </div>
                         </div>
@@ -64,9 +65,13 @@ const showingNavigationDropdown = ref(false);
                                     </template>
 
                                     <template #content>
-                                        <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink>
-                                        <DropdownLink :href="route('logout')" method="post" as="button">
-                                            Log Out
+                                        <DropdownLink
+                                          :href="route('profile.edit')"> Perfil
+                                        </DropdownLink>
+
+                                        <DropdownLink
+                                          :href="route('logout')" method="post" as="button">
+                                            Salir
                                         </DropdownLink>
                                     </template>
                                 </Dropdown>

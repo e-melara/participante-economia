@@ -30,10 +30,15 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $permissions = [];
         $user = $request->user();
+        if(!is_null($user)) {
+          $user->getPermissionsViaRoles();
+        }
+
         $responseTo = array(
           'auth' => [
-            'user' => $user,
+            'user' => $user
           ],
           'status' => [
             'success' => $request->session()->get('success'),
@@ -46,9 +51,6 @@ class HandleInertiaRequests extends Middleware
           $responseTo['auth']['avatar'] = @$user->persona->photo_url();
         }
 
-        return [
-            ...parent::share($request),
-            ...$responseTo
-        ];
+        return $responseTo;
     }
 }

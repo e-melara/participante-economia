@@ -30,6 +30,9 @@ Route::group([ "prefix" => 'v1' ], function() {
 
     Route::post('persona/registro/validar', [\App\Http\Controllers\CtcPersonaController::class, 'validar'])
       ->name('persona.validar');
+
+    Route::post('persona/registro/token', [\App\Http\Controllers\CtcPersonaController::class, 'generateToken'])
+      ->name('persona.token');
 });
 
 require __DIR__.'/auth.php';
