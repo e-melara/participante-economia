@@ -37,11 +37,11 @@
     </template>
   </fwb-modal>
 
-  <div class="container w-full">
+  <div class="w-full">
     <message :props="props.status" v-if="props.status && props.status.show" class="mb-6" />
     <form @submit.prevent="onSubmit">
-      <article class="grid grid-cols-4 gap-4">
-        <div class="col-span-2">
+      <article class="lg:grid lg:grid-cols-4 lg:gap-4 space-y-4lg:space-y-0">
+        <div class="lg:col-span-2">
           <InputLabel for="ocupacion" value="¿Cuál es su situación ocupacional actualmente?" class="mb-2"/>
           <select
             v-model="form.ocupacion" id="ocupacion"
@@ -56,7 +56,7 @@
           </select>
           <message-error v-if="errors.ocupacion" :message="errors.ocupacion" />
         </div>
-        <div class="col-span-2">
+        <div class="lg:col-span-2">
           <InputLabel for="nivel_escolaridad" value="¿Cuál es su máximo nivel de escolaridad en el que ha recibido título o diploma?" class="mb-2"/>
           <select
             id="nivel_escolaridad" v-model="form.nivel_escolaridad" :disabled="haveData || haveDataSaving"
@@ -72,7 +72,7 @@
           </select>
           <message-error v-if="errors.nivel_escolaridad" :message="errors.nivel_escolaridad" />
         </div>
-        <div class="col-span-2">
+        <div class="lg:col-span-2">
           <InputLabel for="ingresos" value="¿Cuál es el nivel de ingresos de su hogar (Hogar: debe sumar los ingresos de todas las personas que viven en su casa) ?" class="mb-2"/>
           <TextInput
             id="ingresos"
@@ -85,7 +85,7 @@
           />
           <message-error v-if="errors.ingresos" :message="errors.ingresos" />
         </div>
-        <div class="col-span-2">
+        <div class="lg:col-span-2">
           <InputLabel for="numero_personas" value="¿Cual el número de personas que viven en su casa (Incluir adultos, niños y adultos mayores)?" class="mb-2"/>
           <TextInput
             id="personas"
@@ -98,7 +98,7 @@
           />
           <message-error v-if="errors.numero_personas" :message="errors.numero_personas" />
         </div>
-        <div class="col-span-full">
+        <div class="lg:col-span-full">
           <InputLabel for="estudiando" value="¿Actualmente se encuentra estudiando en un centro educativo formal (Escuela, Colegio, Universidad, Centro Escolar, Institutos Tecnológicos, Escuela Superior)?" class="mb-2"/>
           <select
             id="estudiando" v-model="form.estudiando" :disabled="haveData || haveDataSaving"
@@ -111,7 +111,7 @@
           <message-error v-if="errors.estudiando" :message="errors.estudiando" />
         </div>
 
-        <div class="col-span-full">
+        <div class="lg:col-span-full">
           <InputLabel for="participa_o_recibe" value="¿Actualmente participa y recibe estipendio en un programa social ejecutado por el gobierno de El Salvador?" class="mb-2"/>
           <select
             id="estudiando" v-model="form.participa_o_recibe" :disabled="haveData || haveDataSaving"
@@ -124,12 +124,12 @@
           <message-error v-if="errors.participa_o_recibe" :message="errors.participa_o_recibe" />
         </div>
 
-        <div class="col-span-full" v-if="!(haveData || haveDataSaving)">
+        <div class="lg:col-span-full" v-if="!(haveData || haveDataSaving)">
           <PrimaryButton>
             Guardar
           </PrimaryButton>
         </div>
-        <div v-else class="col-span-full">
+        <div v-else class="lg:col-span-full">
           <message :props="{ success: 'Gracias por enviar su información. La hemos recibido exitosamente y nuestro equipo se comunicará con usted en breve para brindarle más detalles y los próximos pasos a seguir.' }" />
         </div>
       </article>
