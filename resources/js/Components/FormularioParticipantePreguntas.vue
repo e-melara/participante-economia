@@ -50,9 +50,9 @@
           >
             <option value="null">Seleccione una opción</option>
             <option value="EMPLEO">Empleado formal (Cotiza en ISSS y/o AFP)</option>
-            <option value="DESEMPLEO">Desempleado/Desocupado (Buscan activamente un trabajo)</option>
-            <option value="SUBEMPLEO">Sub-empleado/a (Empleo de jornada reducida (menor a 40 horas semanales)</option>
-            <option value="EMPRENDEDOR">Trabajador por cuenta propia/emprendedor</option>
+            <option value="DESEMPLEO">Desempleado/ Desocupado: personas que no trabajan pero que buscan activamente un trabajo.</option>
+            <option value="SUBEMPLEO">Sub-empleado/a: trabaja  menos de  40 horas semanales sin ISSS y/o AFP</option>
+            <option value="EMPRENDEDOR">Trabajador por cuenta propia/emprendedor: Brinda servicios  por cuenta propia.</option>
           </select>
           <message-error v-if="errors.ocupacion" :message="errors.ocupacion" />
         </div>
@@ -68,7 +68,7 @@
             <option value="PRIMARIA">Básica primaria (1°a 5°)</option>
             <option value="SECUNDARIA">Básica secundaria (6°a 9°)</option>
             <option value="MEDIA">Media (Bachiller)</option>
-            <option value="SUPERIOR">Superior</option>
+            <option value="SUPERIOR">Superior (universitario, postgrados u otros)</option>
           </select>
           <message-error v-if="errors.nivel_escolaridad" :message="errors.nivel_escolaridad" />
         </div>

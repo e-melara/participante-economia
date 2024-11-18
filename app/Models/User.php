@@ -47,6 +47,11 @@ class User extends Authenticatable implements Auditable
         'password' => 'hashed',
     ];
 
+    protected $auditExclude = [
+        'created_at',
+        'updated_at',
+    ];
+
     public function persona()
     {
         return $this->belongsTo(CtcPersona::class, 'persona_id');

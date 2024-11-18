@@ -45,7 +45,6 @@ class GuadarDataParticipanteJob implements ShouldQueue
           exit();
         }
 
-        Log::info(json_encode($response));
         $dataToPerson = $this->getDataFormat($response[0]);
 
         DB::beginTransaction();
