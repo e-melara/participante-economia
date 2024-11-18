@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, defineProps } from "vue";
 import * as yup from "yup";
 import { parse, isValid, isAfter, format } from "date-fns";
 import "@vuepic/vue-datepicker/dist/main.css";
@@ -254,6 +254,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-
-<style>
-</style>

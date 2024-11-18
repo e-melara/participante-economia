@@ -17,11 +17,10 @@
 </template>
 
 <script setup>
+import { defineProps } from 'vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 const {persona} = defineProps({
   persona: Object,
 });
-
-console.log(persona);
 </script>

@@ -1,7 +1,6 @@
 <script setup>
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 
@@ -23,8 +22,13 @@ const form = useForm({
 </script>
 
 <template>
-  <div class="container w-full">
-    <div class="grid grid-cols-3 gap-4">
+  <div class="w-full">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
+      <div>
+        <figure v-if="avatar">
+          <img :src="avatar" alt="imagen del usuario" class="h-64 object-scale-down hover:transition-all w-64 w-full" />
+        </figure>
+      </div>
       <div class="col-span-2">
         <header>
           <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">Información de perfil</h2>
@@ -32,7 +36,7 @@ const form = useForm({
 
         <form @submit.prevent="form.patch(route('profile.update'))" class="mt-6 space-y-6">
           <div>
-            <InputLabel for="name" value="Name" />
+            <InputLabel for="name" value="Nombre" />
 
             <TextInput
               id="name"
@@ -42,14 +46,14 @@ const form = useForm({
               required
               autofocus
               disabled
-              autocomplete="name"
+              autocomplete="Nombre"
             />
 
             <InputError class="mt-2" :message="form.errors.name" />
           </div>
 
           <div>
-            <InputLabel for="email" value="Email" />
+            <InputLabel for="email" value="Correo electronico" />
 
             <TextInput
               id="email"
@@ -58,7 +62,7 @@ const form = useForm({
               v-model="form.email"
               disabled
               required
-              autocomplete="username"
+              autocomplete="Correo electronico"
             />
 
             <InputError class="mt-2" :message="form.errors.email" />
@@ -85,9 +89,8 @@ const form = useForm({
             </div>
           </div>
 
-          <div class="flex items-center gap-4">
-            <!--                <PrimaryButton :disabled="form.processing">Save</PrimaryButton>-->
-
+          <!-- <div class="flex items-center gap-4">
+            <PrimaryButton :disabled="form.processing">Save</PrimaryButton>
             <Transition
               enter-active-class="transition ease-in-out"
               enter-from-class="opacity-0"
@@ -96,13 +99,8 @@ const form = useForm({
             >
               <p v-if="form.recentlySuccessful" class="text-sm text-gray-600 dark:text-gray-400">Saved.</p>
             </Transition>
-          </div>
+          </div> -->
         </form>
-      </div>
-      <div>
-        <figure v-if="avatar">
-          <img :src="avatar" alt="imagen del usuario" class="object-contain h-64 w-full" />
-        </figure>
       </div>
     </div>
   </div>

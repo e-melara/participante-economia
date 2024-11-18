@@ -1,8 +1,16 @@
 <template>
-    <div class="container w-full">
-    <div class="grid grid-cols-3 gap-4">
-      <div class="col-span-2">
-        <article class="grid grid-cols-4 gap-4">
+    <div class="w-full">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">      
+      <div class="lg:col-span-1">
+        <figure v-if="persona.photo" class="flex h-full justify-center">
+          <img :src="persona.photo" 
+            alt="imagen del usuario" 
+            class="h-64 object-scale-down hover:transition-all w-64 w-64 h-full"
+          />
+        </figure>
+      </div>
+      <div class="lg:col-span-2">
+        <article class="lg:space-y-0 space-y-5 lg:grid lg:grid-cols-4 lg:gap-4">
           <div class="col-span-full">
             <InputLabel for="nombre" value="Nombres: " />
             <TextInput
@@ -130,16 +138,13 @@
           </div>
         </article>
       </div>
-      <div>
-        <figure v-if="persona.photo">
-          <img :src="persona.photo" alt="imagen del usuario" class="w-full" />
-        </figure>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { defineProps } from 'vue';
+
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 const {persona} = defineProps({
