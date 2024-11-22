@@ -8,6 +8,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -31,10 +32,14 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
+        $roles = auth()->user()->roles->pluck('name');
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        $routeProvider = RouteServiceProvider::HOME;
+        if( in_array('Administrador', $roles->toArray()) ) {
+            $routeProvider = '/dashboard/usuarios';
+        }
+        return redirect()->intended($routeProvider);
     }
 
     /**

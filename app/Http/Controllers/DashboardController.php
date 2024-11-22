@@ -41,4 +41,9 @@ class DashboardController extends Controller
             'dataToInformacion' => $dataToInformacion,
         ]);
     }
+
+    public function users()
+    {
+        return Inertia::render('Administrador/Users');
+    }
 }

@@ -14,9 +14,11 @@ Route::get('/', function () {
     return Inertia::render('Welcome', compact('fechaLimite'));
 });
 
-Route::get('/dashboard', [ DashboardController::class, 'home' ])
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+Route::group(['middleware' => ['auth', 'verified']], function () {
+    Route::get('/dashboard', [ DashboardController::class, 'home' ])->name('dashboard');
+    Route::get('/dashboard/usuarios', [ DashboardController::class, 'users' ])->name('dashboard.admin');
+});
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

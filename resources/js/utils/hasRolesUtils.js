@@ -16,5 +16,6 @@ const arrayToListRoles = (roles) => {
 
 export const hasPermission = (permissions = []) => {
   const permissionsList = JSON.parse(window.localStorage.getItem('permissions'));
+  console.log(permissionsList);
   return permissions.some(permission => permissionsList.includes(permission));
 }
