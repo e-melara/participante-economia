@@ -133,7 +133,7 @@ hasRolesUtils(roles);
                                 Log Out
                             </ResponsiveNavLink>
                         </div>
-                    </div>
+                    </div>z
                 </div>
             </nav>
 
