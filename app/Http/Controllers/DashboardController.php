@@ -7,13 +7,13 @@ use App\Http\Resources\PersonaResource;
 use App\Models\CtcPersona;
 use App\Models\CtcPersonaInformation;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Inertia\Response;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-  public function home(Request $request)
+  public function home(Request $request) : Response
   {
     $persona = CtcPersona::with([
       'estado_civil', 'genero',
@@ -44,7 +44,7 @@ class DashboardController extends Controller
     ]);
   }
 
-  public function users()
+  public function users(): Response
   {
     $query = User::query();
     $query->with([
@@ -55,7 +55,8 @@ class DashboardController extends Controller
       $query->where('id', 3);
     });
 
-    $personas = new PersonaPaginateResource($query->paginate(10));
-    return Inertia::render('Administrador/Users', compact('personas'));
+    return Inertia::render('Administrador/Users', [
+      'personas' => new PersonaPaginateResource($query->paginate(2))
+    ]);
   }
 }

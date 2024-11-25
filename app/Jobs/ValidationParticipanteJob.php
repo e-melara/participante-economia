@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\CtcPersona;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -45,9 +46,12 @@ class ValidationParticipanteJob implements ShouldQueue
           ]
         );
 
-        if ($personIsAproved) {
-          $personaId = $this->data['personaId'];
+        $personaId = $this->data['personaId'];
+        CtcPersona::where('id', $personaId)->update([
+          'status' => $personIsAproved ? 'aprobado' : 'rechazado',
+        ]);
 
+        if ($personIsAproved) {
           $ctcPersonaDocumento = CtcPersonaContactoDocumento::where(function($query) use ($personaId) {
             $query->where('model_type', 'App\Models\CtcDocumento')
               ->where('persona_id', $personaId)
