@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Log;
 
 class PersonaPaginateResource extends ResourceCollection
 {
@@ -17,19 +18,26 @@ class PersonaPaginateResource extends ResourceCollection
   {
     return [
       'data' => $this->collection->transform(function ($item) {
+        $persona = $item->persona;
         return [
+          'id' => $persona->id,
           'email' => $item->email,
-          'id' => $item->persona->id,
-          'status' => $item->persona->status,
-          'profesion' => $item->persona->profesion,
-          'full_name' => $item->persona->fullName(),
-          'nombres' => $item->persona->nombres,
-          'apellidos' => $item->persona->apellidos,
-          'photo_url' => $item->persona->photo_url(),
-          'edad' => Carbon::parse($item->persona->fecha_nacimiento)->age,
-          'fecha_nacimiento' => Carbon::parse($item->persona->fecha_nacimiento)->format('d/m/Y'),
+          'status' => $persona->status,
+          'nombres' => $persona->nombres,
+          'profesion' => $persona->profesion,
+          'full_name' => $persona->fullName(),
+          'apellidos' => $persona->apellidos,
+          'photo_url' => $persona->photo_url(),
+          'edad' => Carbon::parse($persona->fecha_nacimiento)->age,
+          'fecha_nacimiento' => Carbon::parse($persona->fecha_nacimiento)->format('d/m/Y'),
+          'dui' => $persona->dui->valor,
         ];
-      })
+      }),
+      'meta' => [
+        'total' => $this->total(),
+        'per_page' => $this->perPage(),
+        'page' => $this->currentPage(),
+      ],
     ];
   }
 }

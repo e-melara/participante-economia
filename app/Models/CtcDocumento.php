@@ -12,6 +12,12 @@ class CtcDocumento extends Model
 
     protected $guarded = [];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
+
     public function personas() {
         return $this->morphToMany(CtcPersona::class, 'model', 'ctt_persona_contactos_documentos');
     }

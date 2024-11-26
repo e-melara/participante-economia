@@ -17,6 +17,8 @@ Route::get('/', function () {
 Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('/dashboard', [ DashboardController::class, 'home' ])->name('dashboard');
     Route::get('/dashboard/participantes', [ DashboardController::class, 'users' ])->name('dashboard.admin');
+
+    Route::get('/participantes', [ DashboardController::class, 'usersPagination' ])->name('participantes.pagination');
 });
 
 
